@@ -1,17 +1,23 @@
 # Triad audio player
 
-With Triad, I want to create a simple and useful audio player in Python that is capable of playing my music collection. This seems like a great way to wrap my love of art, code and music into a project I can continue to build out once the core functions have been established. All audio formats should play, but the main trio is: MP3, WAV, FLAC
+### Beta Testing Note:
+* When using the OPEN button you are choosing a directory. Click all the way into the directory/album where the mp3 files are. You won't see the mp3 files. That's normal and you can open it from here. The files will auto-populate.
+
+---
+
+With **Triad**, I want to create a simple and useful audio player in Python that is capable of playing my music collection. This seems like a great way to wrap my love of art, code and music into a project I can continue to build out once the core functions have been established. All audio formats should play, but the main trio is: MP3, WAV, FLAC
 
 ## Basic Functions 
 
-* Playback
-* Skip forward
-* Skip back
-* Stop
-* Display Folder contents
+* ~~PLAY~~
+* ~~Skip forward FWD~~
+* Skip back/RWD
+* ~~PAUSE~~ (Toggle pause play button/combine into one button)
+* ~~Display Folder contents~~
+* Click on files in list to play them 
 * Display Album Art if available
 * Display player logo when not available
-* Create and Save playlists
+* Create/Save/Edit playlists
 * Light/Dark Mode
 
 ## Advanced Functions
