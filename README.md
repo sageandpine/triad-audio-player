@@ -11,7 +11,7 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 
 * ~~PLAY~~
 * ~~Skip forward FWD~~
-* Skip back/RWD
+* ~~Skip back/RWD~~
 * ~~PAUSE~~ (Toggle pause play button/combine into one button)
 * ~~Display Folder contents~~
 * Click on files in list to play them 

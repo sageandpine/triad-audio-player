@@ -4,8 +4,8 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 import os
 import pygame
+import time
 
-# from mutagen.easyid3 import EasyID3
 # from tkinter.messagebox import showinfo
 
 # Initialize sound module
@@ -24,53 +24,72 @@ class Triad:
         self.current_path_dir = ""
         self.next = ""
         self.now_song = ""
+        self.start = 0
+        self.stop = 0
+
+        # self.photo = "./triad_dog.png"
 
         # Tk Window for application
         root = Tk()
         root.title("Triad")
+        root.geometry("600x400")
         root.columnconfigure(0, weight=1)
-        root.rowconfigure(0, weight=1)
+        root.resizable(0, 0)
+        # root.rowconfigure(0, weight=1)
 
         # Tk Frame that fits inside window
         mainframe = ttk.Frame(root, padding="3 3 12 12")
-        mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+        mainframe.grid(column=0, row=5, sticky=(N, W, E, S))
 
         # Buttons for Basic Functions
         self.play_button = ttk.Button(
             mainframe, text="Play", command=self.play_it
-        ).grid(column=1, row=3, sticky=E)
+        ).grid(column=0, row=1)
         self.pause_button = ttk.Button(
             mainframe, text="Pause", command=self.pause_it
-        ).grid(column=2, row=3, sticky=W)
-        self.unpause_button = ttk.Button(
-            mainframe, text="Resume", command=self.unpause_it
-        ).grid(column=3, row=3, sticky=W)
+        ).grid(column=0, row=2)
         self.rewind_button = ttk.Button(
             mainframe, text="RWD", command=self.rwd_it
-        ).grid(column=4, row=3, sticky=E)
+        ).grid(column=0, row=3)
         self.forward_button = ttk.Button(
             mainframe, text="FWD", command=self.fwd_it
-        ).grid(column=5, row=3, sticky=W)
+        ).grid(column=0, row=4)
         self.open_button = ttk.Button(
             mainframe, text="Open", command=self.open_it
-        ).grid(column=6, row=3, sticky=W)
+        ).grid(column=0, row=5)
 
-        # New Frame for listing files when directory chosen
         self.now_playing_list = []
         self.track_index = len(self.now_playing_list)
         self.var = tk.Variable(value=self.now_playing_list)
         self.now_var = tk.Variable(value=self.now_song)
+
+        # Now Playing Label
+        self.now_playing = ttk.Label(mainframe, text="Now Playing: ").grid(
+            column=1, row=6, sticky=W
+        )
+
         self.now_playing = ttk.Label(
-            mainframe, textvariable=self.now_var, justify=CENTER, padding=5
-        ).grid(column=1, row=5)
+            mainframe,
+            textvariable=self.now_var,
+            relief=RIDGE,
+            foreground="green",
+        ).grid(column=2, row=6, sticky=EW)
+
+        # Frame that shows logo or album art
+        self.photo = tk.PhotoImage(file="./triad_dog.png")
+        imageframe = ttk.Frame(root, padding="3 3 12 12")
+        imageframe.grid(column=2, row=4, sticky=W)
+        self.imageframe = ttk.Label(imageframe, image=self.photo, padding=2)
+        self.imageframe.grid(column=0, row=2)
 
         # Frame that lists contents of chosen directory
         fileframe = ttk.Frame(root, padding="3 3 12 12")
         fileframe.grid(columnspan=1, row=4, sticky=W)
         self.file_window = tk.Listbox(
-            fileframe, listvariable=self.var, height=10, width=55, bg="#9F73AB"
+            fileframe, listvariable=self.var, height=10, width=45, bg="#9F73AB"
         )
-        self.file_window.grid(columnspan=4, row=2)
+        self.file_window.grid(column=2, row=0)
+        # self.time = 0
 
         # Main Loop Launches the GUI and keeps it running until the program terminates
         root.mainloop()
@@ -101,6 +120,7 @@ class Triad:
         """Play file loaded for playback."""
         pygame.mixer.music.play()
         self.is_playing = True
+        self.start = time.time()
         self.queue_next()
 
     def pause_it(self):
@@ -131,10 +151,30 @@ class Triad:
             self.now_song = self.now_playing_list[self.current_song]
             self.change_label(self.now_song)
 
+    def skip_back(self):
+        """Skips back to previous track."""
+        if (self.current_song - 1) > 0:
+            self.current_song = self.current_song - 1
+            self.load_it(
+                self.current_path_dir + "/" + self.now_playing_list[self.current_song]
+            )
+            self.play_it()
+            self.now_song = self.now_playing_list[self.current_song]
+            self.change_label(self.now_song)
+        else:
+            self.rwd_it()
+            self.change_label(self.now_song)
+
     def rwd_it(self):
-        """Go back to the begining of currently loaded song, if button pressed less than 2 seconds after start, go back to previous track"""
-        # Needs work. tried several ways of tracking time that did not work. Will come back and re-work
-        pygame.mixer.music.rewind()
+        """Go back to the begining of currently loaded song, if button pressed less than 2 seconds after start, skip_back()"""
+        # Buggy - When skipping back, track 1 throws a recursion error
+        self.stop = time.time()
+        count = self.stop - self.start
+        if count < 4.0:
+            self.skip_back()
+        else:
+            pygame.mixer.music.rewind()
+            self.start = time.time()
 
     def open_it(self):
         """Launch dialog box to choose a file or folder to pick music from. Opens file/directory chosen and starts to play."""
@@ -154,11 +194,19 @@ class Triad:
         self.now_song = self.now_playing_list[self.current_song]
         self.change_label(self.now_song)
 
+        # self.get_song_info()
+
     def update_now_playing(self, songs):
         """Updates the file_window widget."""
         self.file_window.delete(0, END)
         for file in songs:
             self.file_window.insert(END, file)
+
+    # def get_song_info(self):
+    #   song = MP3(self.playlist[self.now_song])
+    #  print(f"Mutagen info for song raw: {song}")
+    # song_data = "Now playing: Nr:" + str(self.actual_song + 1) + " " + \
+    # str(song['title']) + " - " + str(song['artist'])
 
 
 T = Triad()
