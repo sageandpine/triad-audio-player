@@ -19,7 +19,7 @@ class Triad:
 
         # Default attributes
         self.is_playing = is_playing
-        self.play_label = "Play"
+        self.pause_label = "Pause"
         self.current_song = 0
         self.current_path_dir = ""
         self.next = ""
@@ -36,51 +36,33 @@ class Triad:
 
         menuubar = Menu(root)
         root.config(menu=menuubar)
-        
+
         # Create menu bar
 
         # File Menu Drop Down
         file_menu = Menu(menuubar, tearoff=0)
-        file_menu.add_command(
-            label='Open',
-            command=self.open_it
-        )
+        file_menu.add_command(label="Open", command=self.open_it)
 
-        file_menu.add_command(
-            label='Exit',
-            command=root.destroy
-        )
-        
-        
+        file_menu.add_command(label="Exit", command=root.destroy)
+
         # Help Menu Drop Down
         help_menu = Menu(menuubar, tearoff=0)
-        menuubar.add_cascade(
-            label="File",
-            menu=file_menu
-        )
-        menuubar.add_cascade(
-            label="About",
-            menu=help_menu
-        )
-        help_menu.add_command(
-            label='TRIAD',
-            command=self.open_it
-        )
-        help_menu.add_command(
-            label='Help',
-            command=self.open_it
-        )
+        menuubar.add_cascade(label="File", menu=file_menu)
+        menuubar.add_cascade(label="About", menu=help_menu)
+        help_menu.add_command(label="TRIAD", command=self.open_it)
+        help_menu.add_command(label="Help", command=self.open_it)
 
         # Tk Frame that fits inside window
         mainframe = ttk.Frame(root, padding="3 3 12 12")
         mainframe.grid(column=0, row=5, sticky=(N, W, E, S))
 
         # Buttons for Basic Functions
+        self.pause_l = tk.Variable(value=self.pause_label)
         self.play_button = ttk.Button(
             mainframe, text="Play", command=self.play_it
         ).grid(column=0, row=1)
         self.pause_button = ttk.Button(
-            mainframe, text="Pause", command=self.pause_it
+            mainframe, textvariable=self.pause_l, command=self.pause_it
         ).grid(column=0, row=2)
         self.rewind_button = ttk.Button(
             mainframe, text="RWD", command=self.rwd_it
@@ -88,7 +70,7 @@ class Triad:
         self.forward_button = ttk.Button(
             mainframe, text="FWD", command=self.fwd_it
         ).grid(column=0, row=4)
-        
+
         self.now_playing_list = []
         self.track_index = len(self.now_playing_list)
         self.var = tk.Variable(value=self.now_playing_list)
@@ -107,7 +89,7 @@ class Triad:
         ).grid(column=2, row=6, sticky=EW)
 
         # Frame that shows logo or album art
-        self.photo = tk.PhotoImage(file="./triad_dog.png")
+        self.photo = tk.PhotoImage(file="./t_dog_logo.png")
         imageframe = ttk.Frame(root, padding="3 3 12 12")
         imageframe.grid(column=2, row=4, sticky=W)
         self.imageframe = ttk.Label(imageframe, image=self.photo, padding=2)
@@ -117,11 +99,18 @@ class Triad:
         fileframe = ttk.Frame(root, padding="3 3 12 12")
         fileframe.grid(columnspan=1, row=4, sticky=W)
         self.file_window = tk.Listbox(
-            fileframe, listvariable=self.var, height=10, width=45, bg="#9F73AB"
+            fileframe,
+            listvariable=self.var,
+            height=10,
+            width=45,
+            bg="#9F73AB",
+            selectmode=tk.BROWSE,
         )
+        self.file_window.bind("<<ListboxSelect>>", self.selected_item)
         self.file_window.grid(column=2, row=0)
 
         # Main Loop Launches the GUI and keeps it running until the program terminates
+
         root.mainloop()
 
     def load_it(self, file):
@@ -149,21 +138,22 @@ class Triad:
         """Play file loaded for playback."""
         pygame.mixer.music.play()
         self.is_playing = True
-        self.start = time.time()
         self.queue_next()
 
     def pause_it(self):
-        """Pause File currently playing."""
-        pygame.mixer.music.pause()
-        self.is_playing = False
-
-    def unpause_it(self):
-        """UnPause File That is paused. Combine with Pause via With loop."""
-        pygame.mixer.music.unpause()
-        self.is_playing = True
+        """Pause File currently playing. Press again to resume."""
+        if self.is_playing:
+            pygame.mixer.music.pause()
+            self.is_playing = False
+            self.pause_l.set("Resume")
+        else:
+            pygame.mixer.music.unpause()
+            self.is_playing = True
+            self.pause_l.set("Pause")
 
     def fwd_it(self):
-        """FWD should load a new track and play it. When we come to the end of the playlist, automatically re-starts at track 1."""
+        """FWD should load a new track and play it. When we come to the end of the playlist
+        automatically re-starts at track 1."""
         if (self.current_song + 1) < len(self.now_playing_list):
             self.current_song = self.current_song + 1
             self.load_it(
@@ -228,6 +218,14 @@ class Triad:
         self.file_window.delete(0, END)
         for file in songs:
             self.file_window.insert(END, file)
+
+    def selected_item(self, event):
+        index = self.file_window.curselection()
+        index = int(index[0])
+        self.load_it(self.current_path_dir + "/" + self.now_playing_list[index])
+        self.play_it()
+        self.now_song = self.now_playing_list[index]
+        self.change_label(self.now_song)
 
 
 T = Triad()
