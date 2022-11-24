@@ -27,15 +27,49 @@ class Triad:
         self.start = 0
         self.stop = 0
 
-        # self.photo = "./triad_dog.png"
-
         # Tk Window for application
         root = Tk()
         root.title("Triad")
         root.geometry("600x400")
         root.columnconfigure(0, weight=1)
         root.resizable(0, 0)
-        # root.rowconfigure(0, weight=1)
+
+        menuubar = Menu(root)
+        root.config(menu=menuubar)
+        
+        # Create menu bar
+
+        # File Menu Drop Down
+        file_menu = Menu(menuubar, tearoff=0)
+        file_menu.add_command(
+            label='Open',
+            command=self.open_it
+        )
+
+        file_menu.add_command(
+            label='Exit',
+            command=root.destroy
+        )
+        
+        
+        # Help Menu Drop Down
+        help_menu = Menu(menuubar, tearoff=0)
+        menuubar.add_cascade(
+            label="File",
+            menu=file_menu
+        )
+        menuubar.add_cascade(
+            label="About",
+            menu=help_menu
+        )
+        help_menu.add_command(
+            label='TRIAD',
+            command=self.open_it
+        )
+        help_menu.add_command(
+            label='Help',
+            command=self.open_it
+        )
 
         # Tk Frame that fits inside window
         mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -54,10 +88,7 @@ class Triad:
         self.forward_button = ttk.Button(
             mainframe, text="FWD", command=self.fwd_it
         ).grid(column=0, row=4)
-        self.open_button = ttk.Button(
-            mainframe, text="Open", command=self.open_it
-        ).grid(column=0, row=5)
-
+        
         self.now_playing_list = []
         self.track_index = len(self.now_playing_list)
         self.var = tk.Variable(value=self.now_playing_list)
@@ -89,14 +120,12 @@ class Triad:
             fileframe, listvariable=self.var, height=10, width=45, bg="#9F73AB"
         )
         self.file_window.grid(column=2, row=0)
-        # self.time = 0
 
         # Main Loop Launches the GUI and keeps it running until the program terminates
         root.mainloop()
 
     def load_it(self, file):
         """Load file for playback"""
-        # print(f"load it took on this file: {file}")
         pygame.mixer.music.load(file)
 
     def change_label(self, new):
@@ -167,7 +196,7 @@ class Triad:
 
     def rwd_it(self):
         """Go back to the begining of currently loaded song, if button pressed less than 2 seconds after start, skip_back()"""
-        # Buggy - When skipping back, track 1 throws a recursion error
+        # Buggy - When skipping back, track 1 throws a recursion error and will not load Track 1
         self.stop = time.time()
         count = self.stop - self.start
         if count < 4.0:
@@ -194,19 +223,11 @@ class Triad:
         self.now_song = self.now_playing_list[self.current_song]
         self.change_label(self.now_song)
 
-        # self.get_song_info()
-
     def update_now_playing(self, songs):
         """Updates the file_window widget."""
         self.file_window.delete(0, END)
         for file in songs:
             self.file_window.insert(END, file)
-
-    # def get_song_info(self):
-    #   song = MP3(self.playlist[self.now_song])
-    #  print(f"Mutagen info for song raw: {song}")
-    # song_data = "Now playing: Nr:" + str(self.actual_song + 1) + " " + \
-    # str(song['title']) + " - " + str(song['artist'])
 
 
 T = Triad()
