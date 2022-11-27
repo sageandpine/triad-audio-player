@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import *
 from tkinter import filedialog as fd
 from tkinter import ttk
+from tinytag import TinyTag as td
 import os
 import pygame
 import time
 
-# from tkinter.messagebox import showinfo
+# import sqlite3
+from tkinter.messagebox import showinfo
 
 # Initialize sound module
 class Triad:
@@ -26,6 +28,18 @@ class Triad:
         self.now_song = ""
         self.start = 0
         self.stop = 0
+
+        # Song metadata
+        self.title = ""
+        self.artist = ""
+        self.genre = ""
+        self.year = ""
+        self.bit_rate = ""
+        self.composer = ""
+        self.file_size = ""
+        self.album_artist = ""
+        self.duration = ""
+        self.track_total = ""
 
         # Tk Window for application
         root = Tk()
@@ -49,8 +63,20 @@ class Triad:
         help_menu = Menu(menuubar, tearoff=0)
         menuubar.add_cascade(label="File", menu=file_menu)
         menuubar.add_cascade(label="About", menu=help_menu)
-        help_menu.add_command(label="TRIAD", command=self.open_it)
-        help_menu.add_command(label="Help", command=self.open_it)
+        help_menu.add_command(
+            label="TRIAD",
+            command=lambda: showinfo(
+                title="TRIAD",
+                message="Triad is a wicked awesome audio player built by pc84! Enjoy!",
+            ),
+        )
+        help_menu.add_command(
+            label="Help",
+            command=lambda: showinfo(
+                title="Help",
+                message="Visit this projects Github:\ngithub.com/sageandpine/triad-audio-player",
+            ),
+        )
 
         # Tk Frame that fits inside window
         mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -75,6 +101,7 @@ class Triad:
         self.track_index = len(self.now_playing_list)
         self.var = tk.Variable(value=self.now_playing_list)
         self.now_var = tk.Variable(value=self.now_song)
+        # self.now_var = tk.Variable(value=self.title)
 
         # Now Playing Label
         self.now_playing = ttk.Label(mainframe, text="Now Playing: ").grid(
@@ -137,6 +164,9 @@ class Triad:
     def play_it(self):
         """Play file loaded for playback."""
         pygame.mixer.music.play()
+        self.get_meta(
+            self.current_path_dir + "/" + self.now_playing_list[self.current_song]
+        )
         self.is_playing = True
         self.queue_next()
 
@@ -162,6 +192,7 @@ class Triad:
             self.play_it()
             self.now_song = self.now_playing_list[self.current_song]
             self.change_label(self.now_song)
+            # self.change_label("#" + (str(self.current_song + 1)) + " Artist: " + self.artist + " Song: " + self.title + " ")
 
         else:
             self.load_it(self.current_path_dir + "/" + self.now_playing_list[0])
@@ -180,6 +211,7 @@ class Triad:
             self.play_it()
             self.now_song = self.now_playing_list[self.current_song]
             self.change_label(self.now_song)
+
         else:
             self.rwd_it()
             self.change_label(self.now_song)
@@ -200,13 +232,16 @@ class Triad:
         self.now_playing_list.clear()
         self.current_path_dir = str(fd.askdirectory())
         file_list = os.listdir(self.current_path_dir)
-        for file in file_list:
-            if ".mp3" in file:
-                self.now_playing_list.append(file)
+        for file_1 in file_list:
+            if ".mp3" in file_1:
+                self.now_playing_list.append(file_1)
         self.now_playing_list.sort()
         songs = self.now_playing_list
         self.update_now_playing(songs)
         self.load_it(
+            self.current_path_dir + "/" + self.now_playing_list[self.current_song]
+        )
+        self.get_meta(
             self.current_path_dir + "/" + self.now_playing_list[self.current_song]
         )
         self.play_it()
@@ -220,12 +255,31 @@ class Triad:
             self.file_window.insert(END, file)
 
     def selected_item(self, event):
+        """Select/play file from file_window widget with cursor."""
         index = self.file_window.curselection()
         index = int(index[0])
         self.load_it(self.current_path_dir + "/" + self.now_playing_list[index])
+        self.get_meta(
+            self.current_path_dir + "/" + self.now_playing_list[self.current_song]
+        )
         self.play_it()
         self.now_song = self.now_playing_list[index]
         self.change_label(self.now_song)
+
+    def get_meta(self, file):
+        """Retrieve metadata from song playing."""
+        audio = td.get(file)
+
+        self.title = audio.title
+        self.artist = audio.artist
+        self.genre = audio.genre
+        self.year = audio.year
+        self.bit_rate = str(audio.bitrate)
+        self.composer = audio.composer
+        self.file_size = audio.filesize
+        self.album_artist = audio.albumartist
+        self.duration = str(audio.duration)
+        self.track_total = str(audio.track_total)
 
 
 T = Triad()
