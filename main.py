@@ -2,13 +2,14 @@ import tkinter as tk
 from tkinter import *
 from tkinter import filedialog as fd
 from tkinter import ttk
+from tkinter.messagebox import showinfo
 from tinytag import TinyTag as td
 import os
+from os.path import exists
 import pygame
 import time
+import json
 
-# import sqlite3
-from tkinter.messagebox import showinfo
 
 # Initialize sound module
 class Triad:
@@ -28,6 +29,8 @@ class Triad:
         self.now_song = ""
         self.start = 0
         self.stop = 0
+        # self.closing_list = []
+        self.closing_list = []
 
         # Song metadata
         self.title = ""
@@ -56,8 +59,8 @@ class Triad:
         # File Menu Drop Down
         file_menu = Menu(menuubar, tearoff=0)
         file_menu.add_command(label="Open", command=self.open_it)
-
         file_menu.add_command(label="Exit", command=root.destroy)
+        # file_menu.add_command(label="Exit", command=self.save_closing_list)
 
         # Help Menu Drop Down
         help_menu = Menu(menuubar, tearoff=0)
@@ -98,6 +101,7 @@ class Triad:
         ).grid(column=0, row=4)
 
         self.now_playing_list = []
+        self.last_played = []
         self.track_index = len(self.now_playing_list)
         self.var = tk.Variable(value=self.now_playing_list)
         self.now_var = tk.Variable(value=self.now_song)
@@ -135,10 +139,15 @@ class Triad:
         )
         self.file_window.bind("<<ListboxSelect>>", self.selected_item)
         self.file_window.grid(column=2, row=0)
+        # Retrieve last played playlist and load upon opening program
+        self.fetch_closing_list()
 
         # Main Loop Launches the GUI and keeps it running until the program terminates
 
         root.mainloop()
+
+    def close_program(self):
+        pass
 
     def load_it(self, file):
         """Load file for playback"""
@@ -201,28 +210,46 @@ class Triad:
             self.now_song = self.now_playing_list[self.current_song]
             self.change_label(self.now_song)
 
-    def skip_back(self):
-        """Skips back to previous track."""
-        if (self.current_song - 1) > 0:
-            self.current_song = self.current_song - 1
-            self.load_it(
-                self.current_path_dir + "/" + self.now_playing_list[self.current_song]
-            )
-            self.play_it()
-            self.now_song = self.now_playing_list[self.current_song]
-            self.change_label(self.now_song)
-
-        else:
-            self.rwd_it()
-            self.change_label(self.now_song)
-
     def rwd_it(self):
-        """Go back to the begining of currently loaded song, if button pressed less than 2 seconds after start, skip_back()"""
-        # Buggy - When skipping back, track 1 throws a recursion error and will not load Track 1
+        """Go back to the begining of currently loaded song.
+        If RWD button pressed less than 4 seconds after start of track,
+        skips back to previous track."""
         self.stop = time.time()
         count = self.stop - self.start
         if count < 4.0:
-            self.skip_back()
+            if (self.current_song - 1) > 0:
+                self.current_song = self.current_song - 1
+                self.load_it(
+                    self.current_path_dir
+                    + "/"
+                    + self.now_playing_list[self.current_song]
+                )
+                self.play_it()
+                self.now_song = self.now_playing_list[self.current_song]
+                self.change_label(self.now_song)
+            elif (self.current_song - 1) == 0:
+                self.current_song = self.current_song - 1
+                self.load_it(
+                    self.current_path_dir
+                    + "/"
+                    + self.now_playing_list[self.current_song]
+                )
+                self.play_it()
+                self.now_song = self.now_playing_list[self.current_song]
+                self.change_label(self.now_song)
+            elif (self.current_song) == 1:
+                self.current_song = self.current_song - 1
+                self.load_it(
+                    self.current_path_dir
+                    + "/"
+                    + self.now_playing_list[self.current_song]
+                )
+                self.play_it()
+                self.now_song = self.now_playing_list[self.current_song]
+                self.change_label(self.now_song)
+            else:
+                pygame.mixer.music.rewind()
+                self.change_label(self.now_song)
         else:
             pygame.mixer.music.rewind()
             self.start = time.time()
@@ -244,6 +271,7 @@ class Triad:
         self.get_meta(
             self.current_path_dir + "/" + self.now_playing_list[self.current_song]
         )
+        self.save_closing_list()
         self.play_it()
         self.now_song = self.now_playing_list[self.current_song]
         self.change_label(self.now_song)
@@ -269,7 +297,6 @@ class Triad:
     def get_meta(self, file):
         """Retrieve metadata from song playing."""
         audio = td.get(file)
-
         self.title = audio.title
         self.artist = audio.artist
         self.genre = audio.genre
@@ -280,6 +307,32 @@ class Triad:
         self.album_artist = audio.albumartist
         self.duration = str(audio.duration)
         self.track_total = str(audio.track_total)
+
+    def save_closing_list(self):
+        """Saves the now playing list when closing program. If first time playing,
+        creates CLOSING FILE to be recalled and loaded next time program is loaded.
+        Otherwise it recalls CLOSING FILE in memory"""
+        self.closing_list.append(self.current_path_dir + "/")
+        for i in range(len(self.now_playing_list)):
+            self.closing_list.append(self.now_playing_list[i])
+        json_object = json.dumps(self.closing_list, indent=4)
+        with open("recall_list.json", "w") as outfile:
+            outfile.write(json_object)
+        self.closing_list.clear()
+
+    def fetch_closing_list(self):
+        """Fetch recall_list.json file to populate now_playing_list on program launch. If first time opening program,
+        function is skipped."""
+        if exists("recall_list.json"):
+            with open("recall_list.json", "r") as openfile:
+                json_object = json.load(openfile)
+                self.current_path_dir = json_object[0]
+                self.update_now_playing(json_object[1:])
+                self.now_playing_list = json_object[1:]
+            self.load_it(self.current_path_dir + "/" + self.now_playing_list[0])
+            self.get_meta(self.current_path_dir + "/" + self.now_playing_list[0])
+        else:
+            pass
 
 
 T = Triad()

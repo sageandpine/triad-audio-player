@@ -17,6 +17,7 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 * ~~Click on files in list to play them~~
 * Display Album Art if available
 * ~~Display player logo when not available~~
+* ~~Recall last played list on launch~~
 * Create/Save/Edit playlists
 * Shuffle
 * Loop single/ Loop All
