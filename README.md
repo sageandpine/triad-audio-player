@@ -23,6 +23,8 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 * Loop single/ Loop All
 * Refine GUI
 
+## Create Unit Tests
+
 ## Advanced Functions
 * Accept FLAC/WAV
 * Light/Dark Mode

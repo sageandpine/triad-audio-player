@@ -29,12 +29,12 @@ class Triad:
         self.now_song = ""
         self.start = 0
         self.stop = 0
-        # self.closing_list = []
         self.closing_list = []
 
         # Song metadata
         self.title = ""
         self.artist = ""
+        self.album = ""
         self.genre = ""
         self.year = ""
         self.bit_rate = ""
@@ -60,7 +60,6 @@ class Triad:
         file_menu = Menu(menuubar, tearoff=0)
         file_menu.add_command(label="Open", command=self.open_it)
         file_menu.add_command(label="Exit", command=root.destroy)
-        # file_menu.add_command(label="Exit", command=self.save_closing_list)
 
         # Help Menu Drop Down
         help_menu = Menu(menuubar, tearoff=0)
@@ -105,7 +104,6 @@ class Triad:
         self.track_index = len(self.now_playing_list)
         self.var = tk.Variable(value=self.now_playing_list)
         self.now_var = tk.Variable(value=self.now_song)
-        # self.now_var = tk.Variable(value=self.title)
 
         # Now Playing Label
         self.now_playing = ttk.Label(mainframe, text="Now Playing: ").grid(
@@ -139,6 +137,7 @@ class Triad:
         )
         self.file_window.bind("<<ListboxSelect>>", self.selected_item)
         self.file_window.grid(column=2, row=0)
+
         # Retrieve last played playlist and load upon opening program
         self.fetch_closing_list()
 
@@ -146,15 +145,18 @@ class Triad:
 
         root.mainloop()
 
-    def close_program(self):
-        pass
-
     def load_it(self, file):
         """Load file for playback"""
+        if not isinstance(file, str):
+            raise Exception("File loaded must be string")
+        if ".mp3" not in file:
+            raise Exception("File Type not supported")
         pygame.mixer.music.load(file)
 
     def change_label(self, new):
         """Change text label to reflect song playing."""
+        if not isinstance(new, str):
+            raise Exception("To change label, must use string data type.")
         self.now_var.set(new)
 
     def queue_next(self):
@@ -256,12 +258,17 @@ class Triad:
 
     def open_it(self):
         """Launch dialog box to choose a file or folder to pick music from. Opens file/directory chosen and starts to play."""
+        # Commented out sections as I tested changes in how open_it parses data and uses the metadata collected.
+        # Also experimented with opening files not directory
         self.now_playing_list.clear()
         self.current_path_dir = str(fd.askdirectory())
+        # file_list = list(fd.askopenfilenames())
         file_list = os.listdir(self.current_path_dir)
         for file_1 in file_list:
             if ".mp3" in file_1:
+                # self.get_meta(file_1)
                 self.now_playing_list.append(file_1)
+            # self.now_playing_list.append(f"Artist: {self.artist} Album: {self.album} Song: {self.title}")
         self.now_playing_list.sort()
         songs = self.now_playing_list
         self.update_now_playing(songs)
@@ -278,6 +285,8 @@ class Triad:
 
     def update_now_playing(self, songs):
         """Updates the file_window widget."""
+        if not isinstance(songs, list):
+            raise Exception("songs loaded must be list type.")
         self.file_window.delete(0, END)
         for file in songs:
             self.file_window.insert(END, file)
@@ -307,6 +316,7 @@ class Triad:
         self.album_artist = audio.albumartist
         self.duration = str(audio.duration)
         self.track_total = str(audio.track_total)
+        self.album = audio.album
 
     def save_closing_list(self):
         """Saves the now playing list when closing program. If first time playing,
@@ -335,4 +345,7 @@ class Triad:
             pass
 
 
+# Comment out for testing
 T = Triad()
+# T.load_it("load")
+# T.change_label(344)
