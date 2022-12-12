@@ -50,11 +50,10 @@ class Triad:
         root.geometry("600x400")
         root.columnconfigure(0, weight=1)
         root.resizable(0, 0)
-
+        
+        # Create menu bar
         menuubar = Menu(root)
         root.config(menu=menuubar)
-
-        # Create menu bar
 
         # File Menu Drop Down
         file_menu = Menu(menuubar, tearoff=0)
@@ -98,7 +97,6 @@ class Triad:
         self.forward_button = ttk.Button(
             mainframe, text="FWD", command=self.fwd_it
         ).grid(column=0, row=4)
-
         self.now_playing_list = []
         self.last_played = []
         self.track_index = len(self.now_playing_list)
@@ -109,7 +107,6 @@ class Triad:
         self.now_playing = ttk.Label(mainframe, text="Now Playing: ").grid(
             column=1, row=6, sticky=W
         )
-
         self.now_playing = ttk.Label(
             mainframe,
             textvariable=self.now_var,
@@ -142,21 +139,21 @@ class Triad:
         self.fetch_closing_list()
 
         # Main Loop Launches the GUI and keeps it running until the program terminates
-
         root.mainloop()
 
     def load_it(self, file):
         """Load file for playback"""
         if not isinstance(file, str):
-            raise Exception("File loaded must be string")
-        if ".mp3" not in file:
+            raise ValueError("File loaded must be string")
+        if ".mp3" in file:
+            pygame.mixer.music.load(file)
+        else:
             raise Exception("File Type not supported")
-        pygame.mixer.music.load(file)
 
     def change_label(self, new):
         """Change text label to reflect song playing."""
         if not isinstance(new, str):
-            raise Exception("To change label, must use string data type.")
+            raise ValueError("To change label, must use string data type.")
         self.now_var.set(new)
 
     def queue_next(self):
@@ -286,7 +283,7 @@ class Triad:
     def update_now_playing(self, songs):
         """Updates the file_window widget."""
         if not isinstance(songs, list):
-            raise Exception("songs loaded must be list type.")
+            raise ValueError("Songs loaded must be list type.")
         self.file_window.delete(0, END)
         for file in songs:
             self.file_window.insert(END, file)
@@ -347,5 +344,5 @@ class Triad:
 
 # Comment out for testing
 T = Triad()
-# T.load_it("load")
-# T.change_label(344)
+#T.load_it("load")
+#T.change_label(344)
