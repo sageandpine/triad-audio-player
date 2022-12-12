@@ -8,7 +8,8 @@ import os
 from os.path import exists
 import pygame
 import time
-import json
+import csv
+from PIL import Image
 
 
 # Initialize sound module
@@ -27,8 +28,11 @@ class Triad:
         self.current_path_dir = ""
         self.next = ""
         self.now_song = ""
+       # self.now_image = "./t_dog_logo.jpeg"
+       # self.default_image = "./t_dog_logo.jpeg"
         self.start = 0
         self.stop = 0
+        self.field_names = ["PL_Name", "Path", "File_Name", "Title", "Artist", "Album", "Track_Length"]
         self.closing_list = []
 
         # Song metadata
@@ -58,8 +62,10 @@ class Triad:
         # File Menu Drop Down
         file_menu = Menu(menuubar, tearoff=0)
         file_menu.add_command(label="Open", command=self.open_it)
+        file_menu.add_command(label="Open Playlist", command=self.open_playlist)
+        file_menu.add_command(label="Create New Playlist", command=self.create_playlist)
         file_menu.add_command(label="Exit", command=root.destroy)
-
+        
         # Help Menu Drop Down
         help_menu = Menu(menuubar, tearoff=0)
         menuubar.add_cascade(label="File", menu=file_menu)
@@ -97,6 +103,7 @@ class Triad:
         self.forward_button = ttk.Button(
             mainframe, text="FWD", command=self.fwd_it
         ).grid(column=0, row=4)
+
         self.now_playing_list = []
         self.last_played = []
         self.track_index = len(self.now_playing_list)
@@ -319,27 +326,42 @@ class Triad:
         """Saves the now playing list when closing program. If first time playing,
         creates CLOSING FILE to be recalled and loaded next time program is loaded.
         Otherwise it recalls CLOSING FILE in memory"""
-        self.closing_list.append(self.current_path_dir + "/")
-        for i in range(len(self.now_playing_list)):
-            self.closing_list.append(self.now_playing_list[i])
-        json_object = json.dumps(self.closing_list, indent=4)
-        with open("recall_list.json", "w") as outfile:
-            outfile.write(json_object)
+        for i in range(len(self.field_names)):
+            self.closing_list.append(dict(PL_Name = "Closing_List", Path = self.current_path_dir + "/", File_Name = self.now_playing_list[i], Title = self.title, Artist = self.artist, Album = self.album, Track_Length = self.duration))
+        with open('closing_list.csv', 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
+            writer.writeheader()
+            writer.writerows(self.closing_list)
         self.closing_list.clear()
 
     def fetch_closing_list(self):
-        """Fetch recall_list.json file to populate now_playing_list on program launch. If first time opening program,
+        """Fetch closing_list.csv file to populate now_playing_list on program launch. If first time opening program,
         function is skipped."""
-        if exists("recall_list.json"):
-            with open("recall_list.json", "r") as openfile:
-                json_object = json.load(openfile)
-                self.current_path_dir = json_object[0]
-                self.update_now_playing(json_object[1:])
-                self.now_playing_list = json_object[1:]
-            self.load_it(self.current_path_dir + "/" + self.now_playing_list[0])
-            self.get_meta(self.current_path_dir + "/" + self.now_playing_list[0])
+        if exists("closing_list.csv"):
+            with open("closing_list.csv", "r") as openfile:
+                csv_file = csv.DictReader(openfile)
+                for lines in csv_file:
+                    self.current_path_dir = lines["Path"]
+                    self.now_playing_list.append(lines["File_Name"])
+                self.update_now_playing(self.now_playing_list)
+                self.load_it(self.current_path_dir + "/" + self.now_playing_list[0])
+                self.get_meta(self.current_path_dir + "/" + self.now_playing_list[0])
         else:
             pass
+
+    def open_playlist(self):
+        print("Open Up")
+
+    def create_playlist(self):
+        print("Make it")
+
+    def delete_playlist(self):
+        pass
+
+    def add_to_playlist(self):
+        pass
+
+
 
 
 # Comment out for testing
