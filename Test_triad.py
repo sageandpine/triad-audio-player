@@ -1,10 +1,6 @@
 import unittest
 import main
 
-# Test cases not responding as expected. Need work before moving forward on other functions
-# Currently test_load_it should fail because no exception is raised
-
-
 class TestTriad(unittest.TestCase):
     @classmethod
     def setUp(cls):

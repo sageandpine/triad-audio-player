@@ -344,5 +344,4 @@ class Triad:
 
 # Comment out for testing
 T = Triad()
-#T.load_it("load")
-#T.change_label(344)
+
