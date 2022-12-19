@@ -25,10 +25,10 @@ class TestTriad(unittest.TestCase):
             expected_msg = "File Type not supported"
             self.assertEqual(exp.exception, expected_msg)
 
-    def test_change_label(self):
-        """Tests change_label module for Exceptions."""
+    def test_change_song_label(self):
+        """Tests change_song_label module for Exceptions."""
         with self.assertRaises(ValueError) as ctx:
-            main.Triad.change_label(self, self.wrong_type)
+            main.Triad.change_song_label(self, self.wrong_type)
             expected_msg = "To change label, must use string data type."
             self.assertEqual(ctx.exception, expected_msg)
 
