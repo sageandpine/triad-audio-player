@@ -26,7 +26,8 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 * ~~Recall last played list on launch~~
 * ~~Create/Save/Edit playlists~~
 * ~~Shuffle~~
-* ~~Loop single/ Loop All~~
+* ~~Loop single/ Loop All~
+* ~~PL Editing Window~~
 * Refine GUI
 
 ---

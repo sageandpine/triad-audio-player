@@ -50,7 +50,6 @@ class Triad:
         self.editing_list = []
         self.current_path_dir_list = []
 
-
         # Song metadata
         self.title = ""
         self.artist = ""
@@ -80,7 +79,9 @@ class Triad:
         file_menu = Menu(menubar, tearoff=0)
         file_menu.add_command(label="Open Files", command=self.open_it)
         file_menu.add_command(label="Open Playlist", command=self.open_playlist)
-        file_menu.add_command(label="Edit/Create Playlists", command=self.launch_pl_editor)
+        file_menu.add_command(
+            label="Edit/Create Playlists", command=self.launch_pl_editor
+        )
         file_menu.add_command(label="Exit", command=root.destroy)
 
         # Help Menu Drop Down
@@ -160,11 +161,11 @@ class Triad:
         # Album Cover image
         self.imageframe = Label(imageframe, image=self.photo, justify="right")
         self.imageframe.grid(column=0, row=2)
-        
+
         # PL Name
-        self.now_playing_list_title = ttk.Label(imageframe, textvariable=self.pl_title_var).grid(
-            column=0, row=1, sticky=N, padx=0, pady=0
-        )
+        self.now_playing_list_title = ttk.Label(
+            imageframe, textvariable=self.pl_title_var
+        ).grid(column=0, row=1, sticky=N, padx=0, pady=0)
         # Frame that lists contents of chosen files/playlist
         fileframe = ttk.Frame(root, padding="2 2 2 2")
         fileframe.grid(columnspan=1, row=4, sticky=W)
@@ -202,7 +203,7 @@ class Triad:
         if not isinstance(new, str):
             raise ValueError("To change label, must use string data type.")
         self.song_var.set(new)
-    
+
     def change_pl_label(self, new):
         """Change text label to reflect playlist Title."""
         if not isinstance(new, str):
@@ -471,7 +472,7 @@ class Triad:
     def open_playlist(self, *args):
         """open playlist to populate now_playing_list."""
         if args:
-            with open(args, 'r') as file_2:
+            with open(args, "r") as file_2:
                 csv_file = csv.DictReader(file_2)
                 self.now_playing_list.clear()
                 self.current_path_dir_list.clear()
@@ -479,7 +480,9 @@ class Triad:
                     self.current_path_dir_list.append(lines["Path"])
                     self.now_playing_list.append(lines["File_Name"])
                 self.update_now_playing(self.now_playing_list)
-                self.load_it(self.current_path_dir_list[0] + "/" + self.now_playing_list[0])
+                self.load_it(
+                    self.current_path_dir_list[0] + "/" + self.now_playing_list[0]
+                )
                 self.get_meta(self.current_path_dir_list[0], self.now_playing_list[0])
                 self.now_playing_song = self.now_playing_list[0]
                 self.change_song_label(self.now_playing_song)
@@ -547,12 +550,12 @@ class Triad:
                     writer.writerows(self.new_playlist)
                 pl_path = f"./Playlist/{user_input}.csv"
                 self.update_pl_editor(self.editing_list)
-            self.editing_list.clear()       
+            self.editing_list.clear()
 
     def add_to_playlist(self):
         """Add songs to an existing saved playlist"""
         file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
-        y = file_2.readlines()   
+        y = file_2.readlines()
         for names in y:
             title = names.split(",")[2]
             self.editing_list.append(title)
@@ -580,14 +583,15 @@ class Triad:
                         Album_Cover=self.cover,
                     )
                 )
-                #self.now_playing_list.append(name_1)
+                # self.now_playing_list.append(name_1)
                 writer = csv.DictWriter(file, fieldnames=self.field_names)
                 writer.writerows(self.new_playlist)
         self.update_pl_editor(self.editing_list)
         self.editing_list.clear()
         self.new_playlist.clear()
         showinfo(
-            title="Add To Playlist Complete", message=f"You added some sweet tracks to {pl_name}!"
+            title="Add To Playlist Complete",
+            message=f"You added some sweet tracks to {pl_name}!",
         )
 
     def launch_pl_editor(self):
@@ -608,7 +612,7 @@ class Triad:
             selectmode=tk.BROWSE,
         )
         self.pl_window.grid(column=0, row=0)
-        
+
         self.create_button = ttk.Button(
             playlist_frame, text="Create New", command=self.create_playlist
         ).grid(column=0, row=1)
@@ -624,7 +628,7 @@ class Triad:
         self.pl_window.delete(0, END)
         for file in songs:
             self.pl_window.insert(END, file)
-    
+
     def shuffle(self):
         """Shuffles order of now playing list"""
         random.shuffle(self.now_playing_list)
