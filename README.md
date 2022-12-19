@@ -6,7 +6,7 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 ---
 
 ## Beta Testing Notes:
-* Be sure to install pygame & tinytag if running locally
+* Install pygame & tinytag if running python program locally
    - python3 -m pip install -U pygame --user
    - pip install tinytag 
 * ~~When using the OPEN button you are choosing a directory. Click all the way into the directory/album where the mp3 files are. You won't see the mp3 files. That's normal and you can open it from here. The files will auto-populate. May switch to multi-file selction later.~~
@@ -25,8 +25,8 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 * ~~Display player logo when not available~~
 * ~~Recall last played list on launch~~
 * ~~Create/Save/Edit playlists~~
-* Shuffle
-* Loop single/ Loop All
+* ~~Shuffle~~
+* ~~Loop single/ Loop All~~
 * Refine GUI
 
 ---

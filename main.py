@@ -12,6 +12,7 @@ from os.path import exists
 import pygame
 import time
 import csv
+import random
 
 # Initialize sound module
 class Triad:
@@ -28,7 +29,7 @@ class Triad:
         self.current_song = 0
         self.current_path_dir = ""
         self.next = ""
-        self.now_song = ""
+        self.now_song = "3...TRIAD...3"
         self.start = 0
         self.stop = 0
         self.field_names = [
@@ -70,11 +71,11 @@ class Triad:
         root.resizable(0, 0)
 
         # Create menu bar
-        menuubar = Menu(root)
-        root.config(menu=menuubar)
+        menubar = Menu(root)
+        root.config(menu=menubar)
 
         # File Menu Drop Down
-        file_menu = Menu(menuubar, tearoff=0)
+        file_menu = Menu(menubar, tearoff=0)
         file_menu.add_command(label="Open", command=self.open_it)
         file_menu.add_command(label="Open Playlist", command=self.open_playlist)
         file_menu.add_command(label="Create New Playlist", command=self.create_playlist)
@@ -85,9 +86,9 @@ class Triad:
         file_menu.add_command(label="Exit", command=root.destroy)
 
         # Help Menu Drop Down
-        help_menu = Menu(menuubar, tearoff=0)
-        menuubar.add_cascade(label="File", menu=file_menu)
-        menuubar.add_cascade(label="About", menu=help_menu)
+        help_menu = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="File", menu=file_menu)
+        menubar.add_cascade(label="About", menu=help_menu)
         help_menu.add_command(
             label="TRIAD",
             command=lambda: showinfo(
@@ -109,18 +110,30 @@ class Triad:
 
         # Buttons for Basic Functions
         self.pause_l = tk.Variable(value=self.pause_label)
+
         self.play_button = ttk.Button(
             mainframe, text="Play", command=self.play_it
-        ).grid(column=0, row=1)
+        ).grid(column=0, row=3)
+
         self.pause_button = ttk.Button(
             mainframe, textvariable=self.pause_l, command=self.pause_it
-        ).grid(column=0, row=2)
+        ).grid(column=1, row=3)
+
         self.rewind_button = ttk.Button(
             mainframe, text="RWD", command=self.rwd_it
-        ).grid(column=0, row=3)
+        ).grid(column=2, row=3)
+
         self.forward_button = ttk.Button(
             mainframe, text="FWD", command=self.fwd_it
+        ).grid(column=3, row=3)
+
+        self.shuffle_button = ttk.Button(
+            mainframe, text="Shuffle", command=self.shuffle
         ).grid(column=0, row=4)
+
+        self.loop_button = ttk.Button(mainframe, text="Loop 1", command=self.loop).grid(
+            column=1, row=4
+        )
 
         # Playlist Variables to update Label
         self.var = tk.Variable(value=self.now_playing_list)
@@ -128,21 +141,21 @@ class Triad:
 
         # Now Playing Label
         self.now_playing = ttk.Label(mainframe, text="Now Playing: ").grid(
-            column=1, row=6, sticky=W
+            column=0, row=1, sticky=N, padx=0, pady=0
         )
         self.now_playing = ttk.Label(
             mainframe,
             textvariable=self.now_var,
-            relief=RIDGE,
+            relief=SUNKEN,
             foreground="green",
-        ).grid(column=2, row=6, sticky=EW)
+        ).grid(row=2, columnspan=4, sticky=W)
 
         # Frame that shows logo or album art
         self.photo = ImageTk.PhotoImage(Image.open("./t_dog_logo.png"))
 
         # Album Frame to hold image
-        imageframe = ttk.Frame(root, height=200, width=200, padding="2 2 2 2")
-        imageframe.grid(column=2, row=4, sticky=W)
+        imageframe = ttk.Frame(root, height=250, width=200, padding="2 2 2 2")
+        imageframe.grid(column=2, row=4, sticky=N)
 
         # Album Cover image
         self.imageframe = Label(imageframe, image=self.photo, justify="right")
@@ -150,12 +163,12 @@ class Triad:
 
         # Frame that lists contents of chosen directory
         fileframe = ttk.Frame(root, padding="3 3 12 12")
-        fileframe.grid(columnspan=1, row=4, sticky=W)
+        fileframe.grid(columnspan=1, row=4, sticky=N)
         self.file_window = tk.Listbox(
             fileframe,
             listvariable=self.var,
-            height=10,
-            width=45,
+            height=11,
+            width=48,
             bg="#9F73AB",
             selectmode=tk.BROWSE,
         )
@@ -164,6 +177,9 @@ class Triad:
 
         # Retrieve last played playlist and load upon opening program
         self.fetch_closing_list()
+
+        # Sets default loop value to loop all
+        self.loop_one = False
 
         # Main Loop Launches the GUI and keeps it running until the program terminates
         root.mainloop()
@@ -195,16 +211,23 @@ class Triad:
 
     def queue_next(self):
         """Queues next track for playback. If user is at end of playlist, loads 1st track to start over."""
-        if (self.current_song + 1) < len(self.now_playing_list):
+        if self.loop_one == True:
             pygame.mixer.music.queue(
-                self.current_path_dir_list[(self.current_song + 1)]
+                self.current_path_dir_list[(self.current_song - 1)]
                 + "/"
-                + self.now_playing_list[(self.current_song + 1)]
+                + self.now_playing_list[(self.current_song - 1)]
             )
         else:
-            pygame.mixer.music.queue(
-                self.current_path_dir_list[0] + "/" + self.now_playing_list[0]
-            )
+            if (self.current_song + 1) < len(self.now_playing_list):
+                pygame.mixer.music.queue(
+                    self.current_path_dir_list[(self.current_song + 1)]
+                    + "/"
+                    + self.now_playing_list[(self.current_song + 1)]
+                )
+            else:
+                pygame.mixer.music.queue(
+                    self.current_path_dir_list[0] + "/" + self.now_playing_list[0]
+                )
 
     def play_it(self):
         """Play file loaded for playback."""
@@ -231,7 +254,19 @@ class Triad:
     def fwd_it(self):
         """FWD should load a new track and play it. When we come to the end of the playlist
         automatically re-starts at track 1."""
-        if (self.current_song + 1) < len(self.now_playing_list):
+        if self.loop_one == True:
+            self.current_song = self.current_song
+            self.load_it(
+                self.current_path_dir_list[self.current_song]
+                + "/"
+                + self.now_playing_list[self.current_song]
+            )
+            self.play_it()
+            self.now_song = self.now_playing_list[self.current_song]
+            self.change_label(self.now_song)
+            self.update_cover(self.cover)
+
+        elif (self.current_song + 1) < len(self.now_playing_list):
             self.current_song = self.current_song + 1
             self.load_it(
                 self.current_path_dir_list[self.current_song]
@@ -257,7 +292,10 @@ class Triad:
         skips back to previous track."""
         self.stop = time.time()
         count = self.stop - self.start
-        if count < 4.0:
+        if self.loop_one == True:
+            pygame.mixer.music.rewind()
+            self.start = time.time()
+        elif count < 4.0:
             if (self.current_song - 1) > 0:
                 self.current_song = self.current_song - 1
                 self.load_it(
@@ -304,7 +342,7 @@ class Triad:
         self.playlist_name = "Now Playing"
         self.now_playing_list.clear()
         self.current_path_dir_list.clear()
-        file_list = list(fd.askopenfilenames())
+        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         heads_tails = []
         for items in file_list:
             heads_tails.append(os.path.split(items))
@@ -389,17 +427,24 @@ class Triad:
                     Album_Cover=self.cover,
                 )
             )
-        with open("closing_list.csv", "w") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
-            writer.writeheader()
-            writer.writerows(self.closing_list)
-        self.closing_list.clear()
+        if not os.path.isdir("./Playlist"):
+            os.makedirs("Playlist")
+            with open("./Playlist/closing_list.csv", "w") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
+                writer.writeheader()
+                writer.writerows(self.closing_list)
+        else:
+            with open("./Playlist/closing_list.csv", "w") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
+                writer.writeheader()
+                writer.writerows(self.closing_list)
+            self.closing_list.clear()
 
     def fetch_closing_list(self):
         """Fetch closing_list.csv file to populate now_playing_list on program launch. If first time opening program,
         function is skipped."""
-        if exists("closing_list.csv"):
-            with open("closing_list.csv", "r") as openfile:
+        if exists("./Playlist/closing_list.csv"):
+            with open("./Playlist/closing_list.csv", "r") as openfile:
                 csv_file = csv.DictReader(openfile)
                 for lines in csv_file:
                     self.current_path_dir_list.append(lines["Path"])
@@ -413,7 +458,7 @@ class Triad:
         else:
             pass
 
-    def open_playlist(self):
+    def open_playlist(self, *kwarg):
         """open playlist to populate now_playing_list."""
         file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
         csv_file = csv.DictReader(file_2)
@@ -435,12 +480,12 @@ class Triad:
         user_input = simpledialog.askstring(
             title="Playlist Name", prompt="Name this playlist: "
         )
-        file_list = list(fd.askopenfilenames())
+        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         heads_tails = []
         for items in file_list:
             heads_tails.append(os.path.split(items))
         if exists(f"{user_input}.csv"):
-            self.open_playlist
+            self.open_playlist()
         else:
             for (directory_1, name_1) in heads_tails:
                 for pic in glob.glob(f"{directory_1}/*jpg"):
@@ -458,11 +503,18 @@ class Triad:
                         Album_Cover=self.cover,
                     )
                 )
-        with open(f"{user_input}.csv", "w") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
-            writer.writeheader()
-            writer.writerows(self.new_playlist)
-        self.new_playlist.clear()
+            if not os.path.isdir("./PLaylist"):
+                os.makedirs("Playlist")
+                with open(f"./Playlist/{user_input}.csv", "w") as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
+                    writer.writeheader()
+                    writer.writerows(self.new_playlist)
+            else:
+                with open(f"./Playlist/{user_input}.csv", "w") as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=self.field_names)
+                    writer.writeheader()
+                    writer.writerows(self.new_playlist)
+                self.new_playlist.clear()
 
     def delete_from_playlist(self):
         """Remove song(s) from existing playlist"""
@@ -503,15 +555,14 @@ class Triad:
         file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
         y = file_2.readlines()
         pl_name = y[1].split(",")[0]
-        simpledialog.askstring(title=pl_name, prompt="Add to this list?")
-        file_list = list(fd.askopenfilenames())
+        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         heads_tails = []
         for items in file_list:
             heads_tails.append(os.path.split(items))
         for (directory_1, name_1) in heads_tails:
             for pic in glob.glob(f"{directory_1}/*jpg"):
                 self.cover = pic
-            with open((pl_name + ".csv"), "a") as file:
+            with open(f"./Playlist/{pl_name}.csv", "a") as file:
                 self.get_meta(directory_1, name_1)
                 self.new_playlist.append(
                     dict(
@@ -529,6 +580,20 @@ class Triad:
                 writer = csv.DictWriter(file, fieldnames=self.field_names)
                 writer.writerows(self.new_playlist)
             self.new_playlist.clear()
+        showinfo(
+            title="Add To Playlist Complete", message="You added some sweet tracks!"
+        )
+
+    def shuffle(self):
+        """Shuffles order of now playing list"""
+        random.shuffle(self.now_playing_list)
+
+    def loop(self):
+        """Toggle loop single on/off"""
+        if self.loop_one == True:
+            self.loop_one = False
+        else:
+            self.loop_one = True
 
 
 # Comment out for testing
