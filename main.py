@@ -13,6 +13,7 @@ import pygame
 import time
 import csv
 import random
+import pandas as pd
 
 # Initialize sound module
 class Triad:
@@ -78,9 +79,9 @@ class Triad:
         # File Menu Drop Down
         file_menu = Menu(menubar, tearoff=0)
         file_menu.add_command(label="Open Files", command=self.open_it)
-        file_menu.add_command(label="Open Playlist", command=self.open_playlist)
+        file_menu.add_command(label="Open a Playlist", command=self.open_playlist)
         file_menu.add_command(
-            label="Edit/Create Playlists", command=self.launch_pl_editor
+            label="Create/Edit Playlists", command=self.launch_pl_editor
         )
         file_menu.add_command(label="Exit", command=root.destroy)
 
@@ -166,6 +167,7 @@ class Triad:
         self.now_playing_list_title = ttk.Label(
             imageframe, textvariable=self.pl_title_var
         ).grid(column=0, row=1, sticky=N, padx=0, pady=0)
+
         # Frame that lists contents of chosen files/playlist
         fileframe = ttk.Frame(root, padding="2 2 2 2")
         fileframe.grid(columnspan=1, row=4, sticky=W)
@@ -471,39 +473,21 @@ class Triad:
 
     def open_playlist(self, *args):
         """open playlist to populate now_playing_list."""
-        if args:
-            with open(args, "r") as file_2:
-                csv_file = csv.DictReader(file_2)
-                self.now_playing_list.clear()
-                self.current_path_dir_list.clear()
-                for lines in csv_file:
-                    self.current_path_dir_list.append(lines["Path"])
-                    self.now_playing_list.append(lines["File_Name"])
-                self.update_now_playing(self.now_playing_list)
-                self.load_it(
-                    self.current_path_dir_list[0] + "/" + self.now_playing_list[0]
-                )
-                self.get_meta(self.current_path_dir_list[0], self.now_playing_list[0])
-                self.now_playing_song = self.now_playing_list[0]
-                self.change_song_label(self.now_playing_song)
-                self.update_album_cover(self.cover)
-                self.save_closing_list()
-        else:
-            file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
-            csv_file = csv.DictReader(file_2)
-            self.now_playing_list.clear()
-            self.current_path_dir_list.clear()
-            for lines in csv_file:
-                self.current_path_dir_list.append(lines["Path"])
-                self.now_playing_list.append(lines["File_Name"])
-            self.update_now_playing(self.now_playing_list)
-            self.load_it(self.current_path_dir_list[0] + "/" + self.now_playing_list[0])
-            self.get_meta(self.current_path_dir_list[0], self.now_playing_list[0])
-            self.now_playing_song = self.now_playing_list[0]
-            self.change_song_label(self.now_playing_song)
-            self.update_album_cover(self.cover)
-            self.change_pl_label(lines["PL_Name"])
-            self.save_closing_list()
+        file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
+        csv_file = csv.DictReader(file_2)
+        self.now_playing_list.clear()
+        self.current_path_dir_list.clear()
+        for lines in csv_file:
+            self.current_path_dir_list.append(lines["Path"])
+            self.now_playing_list.append(lines["File_Name"])
+        self.update_now_playing(self.now_playing_list)
+        self.load_it(self.current_path_dir_list[0] + "/" + self.now_playing_list[0])
+        self.get_meta(self.current_path_dir_list[0], self.now_playing_list[0])
+        self.now_playing_song = self.now_playing_list[0]
+        self.change_song_label(self.now_playing_song)
+        self.update_album_cover(self.cover)
+        self.change_pl_label(lines["PL_Name"])
+        self.save_closing_list()
 
     def create_playlist(self):
         """Create a new playlist to recall later."""
@@ -583,7 +567,6 @@ class Triad:
                         Album_Cover=self.cover,
                     )
                 )
-                # self.now_playing_list.append(name_1)
                 writer = csv.DictWriter(file, fieldnames=self.field_names)
                 writer.writerows(self.new_playlist)
         self.update_pl_editor(self.editing_list)
@@ -594,7 +577,39 @@ class Triad:
             message=f"You added some sweet tracks to {pl_name}!",
         )
 
+    def delete_from_playlist(self):
+        """Remove song(s) from existing playlist"""
+        temp_list = []
+        file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
+
+        # get files you want removed
+        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
+        heads_tails = []
+        for items in file_list:
+            heads_tails.append(os.path.split(items))
+
+        # Fill list with file names to remove
+        for (directory_1, name_1) in heads_tails:
+            temp_list.append(name_1)
+
+        # Get current csv playlist and convert to dataframe
+        pd.set_option("display.max_columns", None)  # Remove after
+        data = pd.read_csv(file_2)
+
+        # Exclude all rows that have files for removal
+        for song in temp_list:
+            data = data[data["File_Name"] != song]
+
+        # Write to csv with changes made
+        pl_name = data["PL_Name"].loc[data.index[1]]
+        data.to_csv(f"./Playlist/{pl_name}.csv", index=False)
+        showinfo(
+            title="Removal Complete",
+            message=f"You removed tracks you were over to {pl_name}!",
+        )
+
     def launch_pl_editor(self):
+        """Launches the playlist Editor Window"""
         root_2 = Tk()
         root_2.title("Playlist Editor")
         root_2.geometry("600x800")
@@ -612,7 +627,6 @@ class Triad:
             selectmode=tk.BROWSE,
         )
         self.pl_window.grid(column=0, row=0)
-
         self.create_button = ttk.Button(
             playlist_frame, text="Create New", command=self.create_playlist
         ).grid(column=0, row=1)
@@ -620,6 +634,10 @@ class Triad:
         self.add_button = ttk.Button(
             playlist_frame, text="Add To Existing", command=self.add_to_playlist
         ).grid(column=0, row=2)
+
+        self.add_button = ttk.Button(
+            playlist_frame, text="Remove", command=self.delete_from_playlist
+        ).grid(column=0, row=3)
 
     def update_pl_editor(self, songs):
         """Updates the pl editor window widget."""
