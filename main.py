@@ -64,13 +64,12 @@ class Triad:
         self.duration = ""
         self.track_total = ""
         self.cover = "./t_dog_logo.png"
-
-        # Tk Window for application
+        # ---------------------------------------
         root = Tk()
-        root.title("Triad")
-        root.geometry("800x400")
-        root.columnconfigure(0, weight=1)
-        root.resizable(0, 0)
+        root.title("Playlist Editor")
+        root.geometry("800x290")
+        root.columnconfigure(0, weight=4)
+        root.columnconfigure(1, weight=1)
 
         # Create menu bar
         menubar = Menu(root)
@@ -79,7 +78,7 @@ class Triad:
         # File Menu Drop Down
         file_menu = Menu(menubar, tearoff=0)
         file_menu.add_command(label="Open Files", command=self.open_it)
-        file_menu.add_command(label="Open a Playlist", command=self.open_playlist)
+        file_menu.add_command(label="Open Playlist", command=self.open_playlist)
         file_menu.add_command(
             label="Create/Edit Playlists", command=self.launch_pl_editor
         )
@@ -104,83 +103,102 @@ class Triad:
             ),
         )
 
-        # Tk Frame that fits inside window
-        mainframe = ttk.Frame(root, padding="3 3 12 12")
-        mainframe.grid(column=0, row=5, sticky=(N, W, E, S))
-
-        # Buttons for Basic Functions
-        self.pause_l = tk.Variable(value=self.pause_label)
-
-        self.play_button = ttk.Button(
-            mainframe, text="Play", command=self.play_it
-        ).grid(column=0, row=3)
-
-        self.pause_button = ttk.Button(
-            mainframe, textvariable=self.pause_l, command=self.pause_it
-        ).grid(column=1, row=3)
-
-        self.rewind_button = ttk.Button(
-            mainframe, text="RWD", command=self.rwd_it
-        ).grid(column=2, row=3)
-
-        self.forward_button = ttk.Button(
-            mainframe, text="FWD", command=self.fwd_it
-        ).grid(column=3, row=3)
-
-        self.shuffle_button = ttk.Button(
-            mainframe, text="Shuffle", command=self.shuffle
-        ).grid(column=0, row=4)
-
-        self.loop_button = ttk.Button(mainframe, text="Loop 1", command=self.loop).grid(
-            column=1, row=4
-        )
+        # now_playing_list = ["Banana", "Tiki Mugs", "Me Too Me Too!"]
+        # song = "Dreamy Dogs should be great to you all,.mp3"
+        # pl_title = "Dope Playlist"
 
         # Playlist Variables to update Label
         self.list_var = tk.Variable(value=self.now_playing_list)
         self.song_var = tk.Variable(value=self.now_playing_song)
         self.pl_title_var = tk.Variable(value=self.now_playing_list_name)
+        self.pause_l = tk.Variable(value=self.pause_label)
 
-        # Now Playing Label
-        # Track
-        self.now_playing = ttk.Label(mainframe, text="Now Playing: ").grid(
-            column=0, row=1, sticky=N, padx=0, pady=0
-        )
-        self.now_playing = ttk.Label(
-            mainframe,
-            textvariable=self.song_var,
-            relief=SUNKEN,
-            foreground="green",
-        ).grid(row=2, columnspan=4, sticky=W)
+        # list_var = tk.Variable(value=now_playing_list)
+        # song_var = tk.Variable(value=song)
+        # pl_title_var = tk.Variable(value=pl_title)
 
-        # Frame that shows logo or album art
-        self.photo = ImageTk.PhotoImage(Image.open("./t_dog_logo.png"))
-
-        # Album Frame to hold image
-        imageframe = ttk.Frame(root, height=250, width=200, padding="2 2 2 2")
-        imageframe.grid(column=2, row=4, sticky=N)
-
-        # Album Cover image
-        self.imageframe = Label(imageframe, image=self.photo, justify="right")
-        self.imageframe.grid(column=0, row=2)
-
-        # PL Name
-        self.now_playing_list_title = ttk.Label(
-            imageframe, textvariable=self.pl_title_var
-        ).grid(column=0, row=1, sticky=N, padx=0, pady=0)
-
-        # Frame that lists contents of chosen files/playlist
-        fileframe = ttk.Frame(root, padding="2 2 2 2")
-        fileframe.grid(columnspan=1, row=4, sticky=W)
+        # Window Frame & Config
+        window_frame = ttk.Frame(root, padding=5)
+        window_frame.columnconfigure(0, weight=1)
+        window_frame.grid(column=0, row=0, sticky=W)
+        # Put window in frame
         self.file_window = tk.Listbox(
-            fileframe,
+            window_frame,
             listvariable=self.list_var,
             height=11,
             width=72,
             bg="#9F73AB",
             selectmode=tk.BROWSE,
         )
+        self.file_window.grid(column=0, row=0)
         self.file_window.bind("<<ListboxSelect>>", self.play_selected_item)
-        self.file_window.grid(column=2, row=0)
+
+        # Button frame
+        button_frame = ttk.Frame(root, padding=5)
+        button_frame.columnconfigure(0, weight=1)
+        button_frame.grid(column=0, row=1, sticky=W)
+
+        # put buttons in frame
+        self.play_button = ttk.Button(
+            button_frame, text="PLAY", command=self.play_it
+        ).grid(column=0, row=1)
+
+        self.rwd_button = ttk.Button(
+            button_frame, text="REWIND", command=self.rwd_it
+        ).grid(column=1, row=1)
+
+        self.fwd_button = ttk.Button(
+            button_frame, text="FORWARD", command=self.fwd_it
+        ).grid(column=2, row=1)
+
+        self.pause_button = ttk.Button(
+            button_frame, textvariable=self.pause_l, command=self.pause_it
+        ).grid(column=0, row=2)
+
+        self.shuffle_button = ttk.Button(
+            button_frame, text="SHUFFLE", command=self.shuffle
+        ).grid(column=1, row=2)
+
+        self.loop_button = ttk.Button(
+            button_frame, text="LOOP ONE", command=self.loop
+        ).grid(column=2, row=2)
+
+        # Default image album art
+        photo = ImageTk.PhotoImage(Image.open("./t_dog_logo.png"))
+
+        # Album Frame to hold image
+        imageframe = ttk.Frame(root, height=200, width=200, padding=5)
+        imageframe.columnconfigure(0, weight=2)
+        imageframe.grid(column=2, row=0)
+        # Album Cover image
+        self.imageframe = Label(imageframe, image=photo)
+        self.imageframe.grid(column=0, row=0)
+
+        # pl name label frame
+        pl_labelframe = ttk.Frame(root, height=100, width=200, padding=5)
+        pl_labelframe.columnconfigure(0, weight=2)
+        pl_labelframe.grid(column=2, row=1)
+        # pl_name label
+        self.now_playing_list_title = ttk.Label(
+            pl_labelframe, textvariable=self.pl_title_var, relief=SUNKEN, width=25
+        ).grid(column=0, row=1)
+
+        # Make a frame for label
+        label_frame = ttk.Frame(root, padding=5)
+        label_frame.columnconfigure(0, weight=1)
+        label_frame.grid(column=2, row=1, sticky=W)
+
+        # NOW PLaying Label ticker
+        self.now_playing = ttk.Label(button_frame, text="Now Playing: ", width=29).grid(
+            column=3, row=1, padx=5, pady=0, sticky=W
+        )
+        self.now_playing = ttk.Label(
+            button_frame,
+            textvariable=self.song_var,
+            relief=SUNKEN,
+            foreground="green",
+            width=40,
+        ).grid(column=3, row=2, sticky=W, padx=5, pady=0)
 
         # Retrieve last played playlist and load upon opening program
         self.fetch_closing_list()
@@ -188,7 +206,6 @@ class Triad:
         # Sets default loop value to loop all
         self.loop_one = False
 
-        # Main Loop Launches the GUI and keeps it running until the program terminates
         root.mainloop()
 
     def load_it(self, file):
@@ -580,6 +597,8 @@ class Triad:
     def delete_from_playlist(self):
         """Remove song(s) from existing playlist"""
         temp_list = []
+        old_list = []
+
         file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
 
         # get files you want removed
@@ -595,6 +614,8 @@ class Triad:
         # Get current csv playlist and convert to dataframe
         pd.set_option("display.max_columns", None)  # Remove after
         data = pd.read_csv(file_2)
+        old_list = data["File_Name"].tolist()
+        self.update_pl_editor(old_list)
 
         # Exclude all rows that have files for removal
         for song in temp_list:
@@ -603,6 +624,9 @@ class Triad:
         # Write to csv with changes made
         pl_name = data["PL_Name"].loc[data.index[1]]
         data.to_csv(f"./Playlist/{pl_name}.csv", index=False)
+        fresh_data = pd.read_csv(f"./Playlist/{pl_name}.csv")
+        new_list = fresh_data["File_Name"].tolist()
+        self.update_pl_editor(new_list)
         showinfo(
             title="Removal Complete",
             message=f"You removed tracks you were over to {pl_name}!",
@@ -610,34 +634,43 @@ class Triad:
 
     def launch_pl_editor(self):
         """Launches the playlist Editor Window"""
+
         root_2 = Tk()
         root_2.title("Playlist Editor")
         root_2.geometry("600x800")
-        root_2.columnconfigure(0, weight=1)
-        root_2.resizable(0, 0)
+        root_2.columnconfigure(0, weight=4)
+        root_2.columnconfigure(1, weight=1)
 
-        playlist_frame = ttk.Frame(root_2)
-        playlist_frame.grid(columnspan=1, row=4, sticky=N)
         self.pl_window = tk.Listbox(
-            playlist_frame,
+            root_2,
             listvariable=self.list_var,
             height=40,
             width=65,
             bg="#9F73AB",
             selectmode=tk.BROWSE,
+            justify=CENTER,
         )
-        self.pl_window.grid(column=0, row=0)
-        self.create_button = ttk.Button(
-            playlist_frame, text="Create New", command=self.create_playlist
+        self.pl_window.grid(column=0, row=0, padx=10, pady=10)
+
+        # Button frame
+        self.button_frame = ttk.Frame(root_2, padding=5)
+        self.button_frame.columnconfigure(0, weight=1)
+        self.button_frame.grid(columnspan=2, row=1)
+
+        # put buttons in frame
+        self.add_button = ttk.Button(
+            self.button_frame, text="Create New Playlist", command=self.create_playlist
         ).grid(column=0, row=1)
 
         self.add_button = ttk.Button(
-            playlist_frame, text="Add To Existing", command=self.add_to_playlist
-        ).grid(column=0, row=2)
+            self.button_frame,
+            text="Remove from Playlist",
+            command=self.delete_from_playlist,
+        ).grid(column=1, row=1)
 
         self.add_button = ttk.Button(
-            playlist_frame, text="Remove", command=self.delete_from_playlist
-        ).grid(column=0, row=3)
+            self.button_frame, text="Add To Playlist", command=self.add_to_playlist
+        ).grid(column=2, row=1)
 
     def update_pl_editor(self, songs):
         """Updates the pl editor window widget."""

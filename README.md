@@ -28,7 +28,7 @@ With **Triad**, I want to create a simple and useful audio player in Python that
 * ~~Shuffle~~
 * ~~Loop single/ Loop All~
 * ~~PL Editing Window~~
-* Refine GUI
+* ~~Refine GUI~~
 
 ---
 
