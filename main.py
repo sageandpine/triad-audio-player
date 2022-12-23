@@ -116,7 +116,7 @@ class Triad:
         window_frame = ttk.Frame(root, padding=5)
         window_frame.columnconfigure(0, weight=1)
         window_frame.grid(column=0, row=0, sticky=W)
-        
+
         # Put File List Window Widget in Frame
         self.file_window = tk.Listbox(
             window_frame,
@@ -166,7 +166,7 @@ class Triad:
         imageframe = ttk.Frame(root, height=200, width=200, padding=5)
         imageframe.columnconfigure(0, weight=2)
         imageframe.grid(column=2, row=0)
-        
+
         # Album Cover Image
         self.imageframe = Label(imageframe, image=photo)
         self.imageframe.grid(column=0, row=0)
@@ -175,7 +175,7 @@ class Triad:
         pl_labelframe = ttk.Frame(root, height=100, width=200, padding=5)
         pl_labelframe.columnconfigure(0, weight=2)
         pl_labelframe.grid(column=2, row=1)
-        
+
         # Attach Playlist Name Label Widget to Frame
         self.now_playing_list_title = ttk.Label(
             pl_labelframe, textvariable=self.pl_title_var, relief=SUNKEN, width=25
@@ -203,7 +203,7 @@ class Triad:
 
         # Sets Default Loop Value to Loop All
         self.loop_one = False
-        
+
         # Run Main Loop
         root.mainloop()
 
@@ -373,8 +373,8 @@ class Triad:
         file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         if file_list == []:
             showinfo(
-            title="No Files",
-            message=f"No files Chosen!",
+                title="No Files",
+                message=f"No files Chosen!",
             )
             return None
         heads_tails = []
@@ -520,23 +520,20 @@ class Triad:
             title="Playlist Name", prompt="Name this playlist: "
         )
         if user_input == "":
-            showinfo(
-            title="Title Error",
-            message=f"Please Choose a Name for this list"
-            )
+            showinfo(title="Title Error", message=f"Please Choose a Name for this list")
             self.create_playlist()
-        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")])) 
+        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         if file_list == []:
             showinfo(
-            title="No Files",
-            message=f"No files Chosen!",
+                title="No Files",
+                message=f"No files Chosen!",
             )
             return None
         heads_tails = []
         for items in file_list:
             heads_tails.append(os.path.split(items))
         if exists(f"{user_input}.csv"):
-            self.open_playlist() 
+            self.open_playlist()
         else:
             pl_name = user_input
             heads_tails = []
@@ -583,7 +580,7 @@ class Triad:
         for (directory_1, name_1) in heads_tails:
             self.editing_list.append(name_1)
             for pic in glob.glob(f"{directory_1}/*jpg"):
-                self.cover = pic 
+                self.cover = pic
                 self.get_meta(directory_1, name_1)
                 self.new_playlist.append(
                     dict(
@@ -598,7 +595,7 @@ class Triad:
                     )
                 )
         data_new = pd.DataFrame(self.new_playlist)
-        new_df = pd.concat([data, data_new], ignore_index = True)
+        new_df = pd.concat([data, data_new], ignore_index=True)
         new_df.reset_index()
         new_df.to_csv(f"./Playlist/{pl_name}.csv", index=False)
         fresh_data = pd.read_csv(f"./Playlist/{pl_name}.csv")
@@ -617,7 +614,7 @@ class Triad:
         data = pd.read_csv(file_2)
         self.editing_list = data["File_Name"].tolist()
         self.update_pl_editor(self.editing_list)
-        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))        
+        file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         heads_tails = []
         for items in file_list:
             heads_tails.append(os.path.split(items))
@@ -642,7 +639,7 @@ class Triad:
         root_2.geometry("600x800")
         root_2.columnconfigure(0, weight=4)
         root_2.columnconfigure(1, weight=1)
-        # Add List Box to root 
+        # Add List Box to root
         self.pl_window = tk.Listbox(
             root_2,
             listvariable=self.list_var,
@@ -692,6 +689,6 @@ class Triad:
             self.looper_l.set("LOOP ONE")
             self.loop_one = True
 
-            
+
 # Launch Program
 T = Triad()
