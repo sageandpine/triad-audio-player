@@ -38,6 +38,21 @@ class TestTriad(unittest.TestCase):
             main.Triad.update_now_playing(self, self.wrong_type)
             expected_msg = "Songs loaded must be list type."
             self.assertEqual(exp.exception, expected_msg)
+    
+    def test_update_pl_editor(self):
+        "Tests update_pl_editor module for Exceptions."
+        with self.assertRaises(ValueError) as exp:
+            main.Triad.update_pl_editor(self, self.wrong_type)
+            expected_msg = "Songs loaded must be list type."
+            self.assertEqual(exp.exception, expected_msg)
+    
+    def test_get_meta(self):
+        "Tests update_pl_editor module for Exceptions."
+        with self.assertRaises(ValueError) as exp:
+            main.Triad.get_meta(self, self.wrong_type, self.wrong_type)
+            expected_msg = "Directory and File to be loaded must be string type."
+            self.assertEqual(exp.exception, expected_msg)
+        
 
 if __name__ == "__main__":
     unittest.main()
