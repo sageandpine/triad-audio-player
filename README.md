@@ -11,6 +11,9 @@
 ### The Main Player Window can be broken into Four parts:
 
 1. **Now Playing Window**
+    
+    ![Main Player Window](./assets/NP_Window.png "Main Player Window")
+
     * Displays all the files/songs currently staged for playback.
     * Files can be played by double clicking them in the window.
 
@@ -71,16 +74,19 @@
 
 1. **The Playlist Editor Window**: Displays playlists as they are being created or edited.
 
+![Main Player Window](./assets/PL_Window.png "Main Player Window")
+
 2. **The Playlist Editor Function Buttons**
+
+    ![Main Player Window](./assets/PL_Bar.png "Main Player Window")
+
     * **Create New Playlist**: Asks you to name the playlist and then asks which files to add. The files you have chosen will be displayed in the Editor Window.
 
     ![Main Player Window](./assets/Name_PL.png "Main Player Window")
 
     * **Remove from Playlist**: Asks which Playlist you want to edit. Then asks which files you'd like removed. The changes will be displayed in the Editor Window.
     * **Add To Playlist**: Asks which Playlist you want to edit. Then asks which files you'd like to add. The changes will be displayed in the Editor Window.
-* NOTE: This is only a way to View, Edit and Create Playlists. If you want to listen to a playlist you've created, you must return to the main player window and choose "Open Playlist" from the File drop down menu.
-
-![Main Player Window](./assets/PL_Editor_Win.png "Main Player Window")
+* **NOTE**: This is only a way to View, Edit and Create Playlists. If you want to listen to a playlist you've created, you must return to the main player window and choose "Open Playlist" from the File drop down menu.
 
 ---
 
