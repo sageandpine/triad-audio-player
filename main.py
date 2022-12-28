@@ -26,7 +26,7 @@ class Triad:
 
         # Default Attributes
         self.is_playing = is_playing
-        self.pause_label = "Pause"
+        self.pause_label = "PAUSE"
         self.loop_label = "LOOP ALL"
         self.current_song_index = 0
         self.current_path_dir = ""
@@ -556,6 +556,8 @@ class Triad:
                         )
                     )
             data_new = pd.DataFrame(self.new_playlist)
+            if not os.path.isdir("./Playlist"):
+                os.makedirs("Playlist")
             data_new.to_csv(f"./Playlist/{pl_name}.csv", index=False)
             self.new_playlist = data_new["File_Name"].tolist()
             self.update_pl_editor(self.new_playlist)
