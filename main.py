@@ -64,7 +64,7 @@ class Triad:
         self.album_artist = ""
         self.duration = ""
         self.track_total = ""
-        self.cover = "./t_dog_logo.png"
+        self.cover = "./assets/t_dog_logo.png"
 
         # Root GUI Window
         root = Tk()
@@ -160,7 +160,7 @@ class Triad:
         ).grid(column=2, row=2)
 
         # Default Image == Logo/ Replaced by Album Art
-        photo = ImageTk.PhotoImage(Image.open("./t_dog_logo.png"))
+        photo = ImageTk.PhotoImage(Image.open("./assets/t_dog_logo.png"))
 
         # Album Frame to Display Image
         imageframe = ttk.Frame(root, height=200, width=200, padding=5)
