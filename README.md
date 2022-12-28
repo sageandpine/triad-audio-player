@@ -48,7 +48,8 @@
 
 4. Menu Bar
     * File
-               ![Main Player Window](./assets/Triad_DropDown_Main.png "Main Player Window")
+        
+        ![Main Player Window](./assets/Triad_DropDown_Main.png "Main Player Window")
     
         - Open File(s): Opens files to be played!
             * Selecting multiple songs: Holding Ctrl as you Click (CTRL + CLICK) lets you pick multiple 'scattered' files(1, 4, 7) within the same folder. Holding Shift while you Click (SHIFT+CLICK) lets you select a group of files in succession (1-10) within the same folder. Click + Drag are not supported to select files.
@@ -57,7 +58,8 @@
         - Exit: Closes the program.
             * When closing the window, TRIAD saves the Now Playing list to memory so when you re-open the program, the last thing you were listening to is waiting for you like an old friend!
     * About
-               ![Main Player Window](./assets/Triad_About.png "Main Player Window")
+
+       ![Main Player Window](./assets/Triad_About.png "Main Player Window")
     
         - TRIAD: Tells you a little about this little audio player.
         - Help: Shares this GITHUB page address.
