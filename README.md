@@ -41,7 +41,7 @@
     * **LOOP ALL / LOOP ONE**
     The LOOP ALL button will initiate either an infinite loop of all the tracks in your now playing list, or it will loop one track repeatedly. The default behavior of TRIAD is to Loop All tracks. This Button label represents the current state of looping and pressing it changes that state.
 
-3. Album Art Window
+3. **Album Art Window**
 
     * On first launch, the TRIAD audio alien dog mascot is displayed. 
     * When songs are selected, TRIAD finds any associated album art and displays it here.
@@ -49,23 +49,23 @@
 
        ![Main Player Window](./assets/Triad_Album_PL.png "Main Player Window")
 
-4. Menu Bar
-    * File
+4. **Menu Bar**
+    * **File**
         
         ![Main Player Window](./assets/Triad_DropDown_Main.png "Main Player Window")
     
-        - Open File(s): Opens files to be played!
+        - **Open File(s)**: Opens files to be played!
             * Selecting multiple songs: Holding Ctrl as you Click (CTRL + CLICK) lets you pick multiple 'scattered' files(1, 4, 7) within the same folder. Holding Shift while you Click (SHIFT+CLICK) lets you select a group of files in succession (1-10) within the same folder. Click + Drag are not supported to select files.
-        - Open Playlist: Choose a pre-saved playlist to be opened and played.
-        - Create/Edit Playlists: Launches the Playlist Editor Window.
-        - Exit: Closes the program.
+        - **Open Playlist**: Choose a pre-saved playlist to be opened and played.
+        - **Create/Edit Playlists**: Launches the Playlist Editor Window.
+        - **Exit**: Closes the program.
             * When closing the window, TRIAD saves the Now Playing list to memory so when you re-open the program, the last thing you were listening to is waiting for you like an old friend!
-    * About
+    * **About**
 
        ![Main Player Window](./assets/Triad_About.png "Main Player Window")
     
-        - TRIAD: Tells you a little about this little audio player.
-        - Help: Shares this GITHUB page address.
+        - **TRIAD**: Tells you a little about this little audio player.
+        - **Help**: Shares this GITHUB page address.
 
 ---
 
