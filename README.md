@@ -36,7 +36,7 @@
     The PAUSE button will pause all audio playing and you will see the label of the button change to say "RESUME". Clicking RESUME will resume audio playback from where it was paused initially and the label will return to "PAUSE". 
 
     * **SHUFFLE**
-    The Shuffle button will randomise the order of audio playback. Currently this change is not represented in your now playing window.
+    The Shuffle button will randomise the order of audio playback.
 
     * **LOOP ALL / LOOP ONE**
     The LOOP ALL button will initiate either an infinite loop of all the tracks in your now playing list, or it will loop one track repeatedly. The default behavior of TRIAD is to Loop All tracks. This Button label represents the current state of looping and pressing it changes that state.
