@@ -574,9 +574,7 @@ class Triad:
                         Album_Cover=self.cover,
                     )
                 )
-                print(self.new_playlist)
         data_new = pd.DataFrame(self.new_playlist)
-        print(data_new)
         if not os.path.isdir("./Playlist"):
             os.makedirs("Playlist")
         data_new.to_csv(f"./Playlist/{pl_name}.csv", index=False)
