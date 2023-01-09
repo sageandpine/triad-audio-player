@@ -412,22 +412,28 @@ class Triad:
     def play_selected_item(self, event):
         """Plays File from File Window Widget Selected With the Cursor by User."""
         index = self.file_window.curselection()
-        if index[0] < 0:
+        if index == ():
+            showinfo(
+                title="Error",
+                message="Must click on a track to play it.",
+            )  
+        elif index[0] < 0:
             raise Exception("Negative index not valid.")
-        self.current_song_index = int(index[0])
-        self.load_it(
-            self.current_path_dir_list[self.current_song_index]
-            + "/"
-            + self.now_playing_list[self.current_song_index]
-        )
-        self.get_meta(
-            self.current_path_dir_list[self.current_song_index],
-            self.now_playing_list[self.current_song_index],
-        )
-        self.play_it()
-        self.now_playing_song = self.now_playing_list[self.current_song_index]
-        self.change_song_label(self.now_playing_song)
-        self.update_album_cover(self.cover)
+        else:
+            self.current_song_index = int(index[0])
+            self.load_it(
+                self.current_path_dir_list[self.current_song_index]
+                + "/"
+                + self.now_playing_list[self.current_song_index]
+            )
+            self.get_meta(
+                self.current_path_dir_list[self.current_song_index],
+                self.now_playing_list[self.current_song_index],
+            )
+            self.play_it()
+            self.now_playing_song = self.now_playing_list[self.current_song_index]
+            self.change_song_label(self.now_playing_song)
+            self.update_album_cover(self.cover)
 
     def get_meta(self, directory_now, file_load):
         """Retrieve Metadata from Song Currently Playing."""
@@ -497,21 +503,33 @@ class Triad:
 
     def open_playlist(self, *args):
         """Open and Load an Existing Playlist."""
-        file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
-        csv_file = csv.DictReader(file_2)
-        self.now_playing_list.clear()
-        self.current_path_dir_list.clear()
-        for lines in csv_file:
-            self.current_path_dir_list.append(lines["Path"])
-            self.now_playing_list.append(lines["File_Name"])
-        self.update_now_playing(self.now_playing_list)
-        self.load_it(self.current_path_dir_list[0] + "/" + self.now_playing_list[0])
-        self.get_meta(self.current_path_dir_list[0], self.now_playing_list[0])
-        self.now_playing_song = self.now_playing_list[0]
-        self.change_song_label(self.now_playing_song)
-        self.update_album_cover(self.cover)
-        self.change_pl_label(lines["PL_Name"])
-        self.save_closing_list()
+        if exists("./Playlist"):
+            showinfo(
+                title="Pick A Playlist",
+                message="Pick a Playlist!",
+            )
+            file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
+            if file_2 == None:
+                raise Exception("No file was chosen.")
+            csv_file = csv.DictReader(file_2)
+            self.now_playing_list.clear()
+            self.current_path_dir_list.clear()
+            for lines in csv_file:
+                self.current_path_dir_list.append(lines["Path"])
+                self.now_playing_list.append(lines["File_Name"])
+            self.update_now_playing(self.now_playing_list)
+            self.load_it(self.current_path_dir_list[0] + "/" + self.now_playing_list[0])
+            self.get_meta(self.current_path_dir_list[0], self.now_playing_list[0])
+            self.now_playing_song = self.now_playing_list[0]
+            self.change_song_label(self.now_playing_song)
+            self.update_album_cover(self.cover)
+            self.change_pl_label(lines["PL_Name"])
+            self.save_closing_list()
+        else:
+            showinfo(
+                title="Error",
+                message="No Playlists Available!",
+            )
 
     def create_playlist(self):
         """Create a New Playlist."""
@@ -520,61 +538,73 @@ class Triad:
             title="Playlist Name", prompt="Name this playlist: "
         )
         if user_input == "":
-            showinfo(title="Title Error", message=f"Please Choose a Name for this list")
+            showinfo(title="Title Error", message="Please Choose a Name for this list")
             self.create_playlist()
+        showinfo(
+                title="Add Songs",
+                message="Pick Songs to Add.",
+            )
         file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         if file_list == []:
             showinfo(
                 title="No Files",
-                message=f"No files Chosen!",
+                message="No files Chosen!",
             )
-            return None
+            #return None
         heads_tails = []
         for items in file_list:
             heads_tails.append(os.path.split(items))
-        if exists(f"{user_input}.csv"):
-            self.open_playlist()
-        else:
-            pl_name = user_input
-            heads_tails = []
-            for items in file_list:
-                heads_tails.append(os.path.split(items))
-            for (directory_1, name_1) in heads_tails:
-                for pic in glob.glob(f"{directory_1}/*jpg"):
-                    self.cover = pic
-                    self.get_meta(directory_1, name_1)
-                    self.new_playlist.append(
-                        dict(
-                            PL_Name=pl_name,
-                            Path=directory_1,
-                            File_Name=name_1,
-                            Title=self.title,
-                            Artist=self.artist,
-                            Album=self.album,
-                            Track_Length=self.duration,
-                            Album_Cover=self.cover,
-                        )
+        pl_name = user_input
+        heads_tails = []
+        for items in file_list:
+            heads_tails.append(os.path.split(items))
+        for (directory_1, name_1) in heads_tails:
+            for pic in glob.glob(f"{directory_1}/*jpg"):
+                self.cover = pic
+                self.get_meta(directory_1, name_1)
+                self.new_playlist.append(
+                    dict(
+                        PL_Name=pl_name,
+                        Path=directory_1,
+                        File_Name=name_1,
+                        Title=self.title,
+                        Artist=self.artist,
+                        Album=self.album,
+                        Track_Length=self.duration,
+                        Album_Cover=self.cover,
                     )
-            data_new = pd.DataFrame(self.new_playlist)
-            if not os.path.isdir("./Playlist"):
-                os.makedirs("Playlist")
-            data_new.to_csv(f"./Playlist/{pl_name}.csv", index=False)
-            self.new_playlist = data_new["File_Name"].tolist()
-            self.update_pl_editor(self.new_playlist)
-            showinfo(
-                title="Add To Playlist Complete",
-                message=f"You added some sweet tracks to: {pl_name}!",
-            )
+                )
+                print(self.new_playlist)
+        data_new = pd.DataFrame(self.new_playlist)
+        print(data_new)
+        if not os.path.isdir("./Playlist"):
+            os.makedirs("Playlist")
+        data_new.to_csv(f"./Playlist/{pl_name}.csv", index=False)
+    
+        self.new_playlist = data_new["File_Name"].tolist()
+        self.update_pl_editor(self.new_playlist)
+        showinfo(
+            title="Create Playlist Complete",
+            message=f"You Created: {pl_name}!",
+        )
 
     def add_to_playlist(self):
         """Add Songs to an Existing Playlist."""
         self.new_playlist.clear()
         self.editing_list.clear()
+        showinfo(
+                title="Choose Playlist",
+                message="Choose a Playlist You Want to Edit!",
+            )
         file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
         data = pd.read_csv(file_2)
         self.editing_list = data["File_Name"].tolist()
         self.update_pl_editor(self.editing_list)
         pl_name = data["PL_Name"].loc[data.index[1]]
+        showinfo(
+                title="Songs",
+                message="Pick Songs to Add.",
+            )
         file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         heads_tails = []
         for items in file_list:
@@ -612,10 +642,18 @@ class Triad:
         """Remove Song(s) From an Existing Playlist."""
         self.new_playlist.clear()
         self.editing_list.clear()
+        showinfo(
+                title="Remove",
+                message="Choose a Playlist to Edit.",
+            )
         file_2 = fd.askopenfile(mode="r", filetypes=[("CSV Files", "*.csv")])
         data = pd.read_csv(file_2)
         self.editing_list = data["File_Name"].tolist()
         self.update_pl_editor(self.editing_list)
+        showinfo(
+                title="Songs",
+                message="Choose Songs to Remove.",
+            )
         file_list = list(fd.askopenfilenames(filetypes=[("MP3 Files", "*.mp3")]))
         heads_tails = []
         for items in file_list:
