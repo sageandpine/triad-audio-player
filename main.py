@@ -15,6 +15,7 @@ import csv
 import random
 import pandas as pd
 
+
 # Initialize sound module
 class Triad:
     def __init__(self, is_playing=False):
