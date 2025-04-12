@@ -2,7 +2,18 @@
 
 ## Introduction
 
-**TRIAD** is a simple audio player written in Python by pc84. It has been a fun way to wrap my love of code and music into a project I can use and continue to build on FOREVER!!! In it's current iteration, TRIAD only supports the MP3 audio file format. In future iterations, there are 3 audio formats I want to be sure are supported: MP3, WAV, FLAC (Hence: TRIAD audio). TRIAD audio player has two display windows: The Main Player Window and the Playlist Editor Window.
+**TRIAD** is a simple audio player written in Python by pc84. 
+It was created as my capstone project while I was a student at NCLABs Python Developer Program. 
+
+This was a fun way to wrap my love of code and music into a single project I can build on FOREVER!!! 
+
+Currently **TRIAD** only supports MP3 audio files. 
+
+Future iterations will aim for 3 audio formats: MP3, WAV, FLAC (Hence: TRIAD audio). 
+
+**TRIAD** audio player has two display windows: 
+- The Main Player Window
+- Playlist Editor Window.
 
 ---
 
@@ -18,7 +29,7 @@
     * Displays all the files/songs currently staged for playback.
     * Files can be played by double clicking them in the window.
 
-2. **Core Functions** 
+2. **Core Features** 
 
     ![Main Player Window](./assets/Triad_Button_Window.png "Main Player Window") 
 
