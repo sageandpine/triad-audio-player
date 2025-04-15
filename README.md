@@ -3,6 +3,7 @@
 ## Introduction
 
 **TRIAD** is a simple audio player written in Python by pc84. 
+
 It was created as my capstone project while I was a student at NCLABs Python Developer Program. 
 
 This was a fun way to wrap my love of code and music into a single project I can build on FOREVER!!! 
@@ -11,11 +12,30 @@ Currently **TRIAD** only supports MP3 audio files.
 
 Future iterations will aim for 3 audio formats: MP3, WAV, FLAC (Hence: TRIAD audio). 
 
+---
+
+**Contributor venv setup**
+- Clone this repo into a project folder
+- In the root directory of the project create a virtual environment
+- Windows:
+    - `python -m venv venv`
+- Linux/Mac
+    - `python3 -m venv myenv`
+- **Activate** the virtual environment (*venv*)
+- Windows(powershell):
+    - `.\venv\Scripts\Activate.ps1`
+- Linux/Mac:
+    - `source venv/bin/activate`
+- Install the libraries:
+    - `pip install -r requirements.txt`
+- To **deactivate** the venv:
+    - `deactivate`
+
+---
+
 **TRIAD** audio player has two display windows: 
 - The Main Player Window
 - Playlist Editor Window.
-
----
 
 ## Main Player Window
 ![Main Player Window](./assets/Triad_Main_Window.png "Main Player Window")
